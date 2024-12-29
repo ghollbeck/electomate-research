@@ -38,10 +38,12 @@ def main():
     print(f"Total number of answers: {total}")
     print(f"Number of matching answers: {agreement}")
     print(f"Agreement percentage: {(agreement/total)*100:.2f}%")
+    # Save agreement percentage as a string
+    agreement_percentage_string = f"{(agreement/total)*100:.2f}%"
 
 
 
-    create_comparison_plot(original_matrix, ai_matrix, questions, party_names)
+    create_comparison_plot(original_matrix, ai_matrix, questions, party_names, agreement_percentage_string)
     print("Comparison plot saved as 'comparison_plot_1.png'")
 
  

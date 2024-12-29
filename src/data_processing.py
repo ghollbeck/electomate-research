@@ -55,7 +55,8 @@ def convert_answer_to_number(answer):
     answer_map = {
         "disagree": -1,
         "neutral": 0,
-        "agree": 1
+        "agree": 1,
+        "UNKNOWN": 10
     }
     return answer_map.get(answer.lower(), 0)
 

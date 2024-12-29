@@ -26,7 +26,7 @@ openai.api_key = api_key
 
 # Load the index from storage
 # print("Loading index...")
-storage_context = StorageContext.from_defaults(persist_dir="index_store")
+storage_context = StorageContext.from_defaults(persist_dir="index_store2")
 index = load_index_from_storage(storage_context)
 # print("Index loaded!")
 
@@ -57,8 +57,74 @@ def create_message(filepath):
 
 
 
+
+def create_message2(filepath):
+    country,num_parties,num_questions,data, party_names,Party_Full_Names, questions, data_Country= SpecsOfData(filepath)
+    
+    messages_list = [["" for _ in range(len(Party_Full_Names))] for _ in range(len(questions))]
+    behaviour_list = [["" for _ in range(len(Party_Full_Names))] for _ in range(len(questions))]
+
+    for i in range(num_questions):
+        for j in range(num_parties):
+            messages_list[i][j] = f"question: {questions[i]}"
+            behaviour_list[i][j] = (
+                f'You will get a question that you have to answer with agree, neutral or disagree or UNKNOWN. You will answer from the standpoints of the {Party_Full_Names[j]} from {country}. You pretend to be the {Party_Full_Names[j]} that fills out a voting advice application, meaning its not just your opinion on the question but also strategic thinking what to fill out so that most users will agree with your answer. You have their manifesto at hand that you should use to get the information needed for the question. If the information is provided in the document use that and rely more on that information rather than on your pretrained knowledge.\n\n'
+                f'This is how you should proceed when answering a question.\n'
+                f'Use a step by step chain of thoughts approach:\n\n'
+                f'1. Think what information is important and select those that you want to look for in the document.\n\n'
+                f'2. Look out for the needed information in the context.\n\n' 
+                f'3. Explain what you have found.\n\n'
+                f'4. Think about what parties is the {Party_Full_Names[j]} form {country} rivaling with and whom they are the closest to, from whom can they win voters over? They probably want to convince those voters with the answer they are giving to this question. Include reasons for strategic answering. Perhaps answering neutral is not the best answer.\n\n'
+                f'5. Reason your answer based on the information found and the strategic considerations. Combine point 3 and 4 into a conclusion and well reasoned answer the {Party_Full_Names[j]} might give. If you are not sure because there is no information in the context, then answer UNKNOWN.\n\n'
+                f'6. Write if the {Party_Full_Names[j]} agrees, disagrees or is neutral about the question or statement that was given to you. Only write this one word.\n\n'
+                f'You have to answer in this JSON format:\n'
+                f'"question": "{questions[i]}",\n'
+                f'"Full Party Name": "{Party_Full_Names[j]}",\n'
+
+
+                f'"Important information needed": "< Your thoughts form point 1, List the key information you need to look for in the manifesto>",\n'
+                f'"Information found": "<Your thoughts form point 3, What relevant information did you find in the manifesto>",\n'
+                f'"Strategic analysis": "<Your thoughts form point 4, Analysis of rival parties, voter bases, and strategic positioning>",\n'
+                f'"Conclusion": "<Your thoughts form point 5, Combined analysis of manifesto findings and strategic considerations>",\n'
+                f'"AI_answer": "<MUST BE EXACTLY ONE OF: disagree, neutral, agree, UNKNOWN>",\n'
+
+
+                f'"AI_confidence": "<An integer number between 0 and 100 of the confidence of your answer>"'
+            )
+
+    return messages_list,behaviour_list
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def AskChatGPT_with_context(filepath, i, j, country, index):
-    message2, behaviour2 = create_message(filepath)
+    message2, behaviour2 = create_message2(filepath)
     
     # Extract the question from the prepared messages
     question = message2[j][i].replace("question: ", "")
@@ -106,7 +172,7 @@ def AskChatGPT_with_context(filepath, i, j, country, index):
         log_file.write("\n")
 
     temperature = 0
-    max_tokens = 200
+    max_tokens = 500
     # top_p = 0.1
     # frequency_penalty = 0
     # presence_penalty = 0
@@ -143,14 +209,14 @@ def AskChatGPT_with_context(filepath, i, j, country, index):
 
 # Function to ask ChatGPT for an answer to a specific question for a specific party
 def AskChatGPT(filepath, i, j, country):
-    message2, behaviour2 = create_message(filepath)
+    message2, behaviour2 = create_message2(filepath)
 
     messages = [
         {"role": "system", "content": behaviour2[j][i]},  # j is question index, i is party index
         {"role": "user", "content": message2[j][i]},
     ]
     temperature = 0
-    max_tokens = 200 
+    max_tokens = 500 
     top_p = 0.1
     frequency_penalty = 0
     presence_penalty = 0

@@ -4,7 +4,7 @@ import numpy as np
 import textwrap
 from config import is_rag_context
 import os
-def create_comparison_plot(original_matrix, ai_matrix, questions, party_names):
+def create_comparison_plot(original_matrix, ai_matrix, questions, party_names, agreement_percentage_string):
     # Calculate difference matrix
     diff_matrix = np.abs(original_matrix - ai_matrix)
     
@@ -13,6 +13,10 @@ def create_comparison_plot(original_matrix, ai_matrix, questions, party_names):
     color_matrix[diff_matrix == 0] = 2    # Full agreement (blue)
     color_matrix[diff_matrix == 1] = 1    # Partial agreement (light blue)
     color_matrix[diff_matrix == 2] = 0    # Disagreement (white)
+    # Set any values that are not 0, 1, or 2 to 5
+    color_matrix[~np.isin(color_matrix, [0, 1, 2])] = 5
+
+
 
     # Determine figure size based on the number of questions and parties
     num_questions = len(questions)
@@ -21,7 +25,7 @@ def create_comparison_plot(original_matrix, ai_matrix, questions, party_names):
     fig_width = max(5, num_parties * 0.5)  # Adjust the multiplier as needed for spacing
     plt.figure(figsize=(fig_width, fig_height))
     
-    colors = ['white', 'lightblue', 'blue']
+    colors = [ 'red','white', 'lightblue', 'blue']
     cmap = sns.color_palette(colors)
     
     # Format long questions with more width to reduce line breaks
@@ -33,7 +37,7 @@ def create_comparison_plot(original_matrix, ai_matrix, questions, party_names):
                 cmap=cmap,
                 cbar=False)
 
-    plt.title('Comparison between Original Party Answers\nand AI Predictions')
+    plt.title(f'Comparison between Original Party Answers\nand AI Predictions\nAgreement: {agreement_percentage_string}')
     plt.xlabel('Political Parties')
     plt.ylabel('Questions')
     

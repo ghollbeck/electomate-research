@@ -20,9 +20,9 @@ openai.api_key = api_key
 modelspec = "gpt-4o"  # gpt-4, gpt-4o, gpt-4o-mini
 cutoff_questions = 38
 cutoff_parties = 1
-is_rag_context = True
+is_rag_context = True  
 
 # New configuration options
-disable_parallelization = True  # Set to True to disable parallel processing
+disable_parallelization = False  # Set to True to disable parallel processing
 chunk_size = 512  # Size of each chunk
 chunk_overlap = 50  # Overlap between chunks

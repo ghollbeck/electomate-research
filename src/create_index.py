@@ -71,8 +71,8 @@ def generate_llm_based_metadata(documents):
 
 
 # Generate metadata for documents
-print("\nAnalyzing documents for metadata...")
-documents = generate_llm_based_metadata(documents)
+#print("\nAnalyzing documents for metadata...")
+#documents = generate_llm_based_metadata(documents)
 
 # Initialize response variable
 response = 'o'  # default to overwrite, needed to not cause error
