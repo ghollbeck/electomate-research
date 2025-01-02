@@ -1,0 +1,545 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2024
+
+% ready for submission
+\usepackage[preprint]{neurips_2024}
+\usepackage{graphicx} 
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+%     \usepackage[preprint]{neurips_2024}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+%     \usepackage[final]{neurips_2024}
+
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2024}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage[dvipsnames]{xcolor}
+\usepackage{float}
+
+\title{Generative AI in Voting Advice Applications
+}
+
+% Author information with footnote for contribution
+\author{%
+Gabor Hollbeck \\
+  ETH Zürich\\
+    \texttt{ghollbeck@ethz.ch} \\
+  \And
+  Yuri Simantob \\
+  ETH Zürich\\
+    \texttt{ysimantob@ethz.ch} \\
+     \And
+  Jonathan Maillefaud \\
+  ETH Zürich\\
+    \texttt{jmaillefaud@ethz.ch} \\
+  \And
+    Mercedes Scheible\\
+  Hochschule Sankt Gallen (HSG)\\
+\texttt{mercedes.scheible@student.unisg.ch} \\
+\And
+    Atonio Guillebeau\\
+  Universität Zürich (UZH)\\
+\texttt{antonio.guillebeau@bf.uzh.ch} \\
+\And
+    Aimen Taimur\\
+  Tilburg Institute for Law, Technology, and Society\\
+\texttt{a.taimur@tilburguniversity.edu} \\
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+Add predictions of questions and Answers\\\\
+
+In the past decade Voting Advice Applications (VAAs) have become an established source of information for elections in many countries around the world. With the rise of generative AI, these simple and deterministic VAAs are facing a potential extension with probabilistic and more complex competitors. Moreover, AI models show clear political tendencies when applied to questions of conventional VAAs. How does this affect the output of LLMs in queries related to voting advice and election information, and how can we mitigate that bias? \\
+This research performs a risk analysis for large language models (LLMs) in the realm of election information and VAAs. Specific subjects of exploration are bias, hallucination, predictive accuracy of election pledges and party statements. Key methodologies include sentiment analysis and examination of the influence of factors, such as the political party, topic, model choice, country, and context, on the accuracy of Retrieval Augmented Generation (RAG). Various sourcing techniques, such as manifestos, domain-restricted searches, unrestricted searches, and YouTube videos provide contexts of controllability. Lastly, the study compares AI-generated predictions of party answers with actual election pledges and past legislative resolutions, providing an analysis of the improvements brought by AI-driven VAAs over traditional VAAs.
+\\
+\\ We additionally desig an algorithm that finds relevant questions for the VAAs as well as the answers for those questions.  We also invert the design choice of existing VAAs from issue based approach to a expressionistic bottom up approach to potical matchmaking. \\
+The initial findings show ... \\\\
+
+By providing a statistical framework for evaluating LLM behaviour in political issues, we enhance the safety and reliability of AI in and outside of election times.
+
+
+\end{abstract}
+
+
+\newpage
+% Generate table of contents
+\tableofcontents
+\newpage  
+
+%https://www.abgeordnetenwatch.de/api
+%https://www.eods.eu/posts/democracy-reporting-international-dri
+
+\section{Introduction}
+
+
+The rapid advancements in artificial intelligence (AI) have led to significant changes in electoral processes, providing new opportunities for improving democratic engagement and election management. Over time, AI technologies have evolved from traditional statistical methods to more advanced deep learning-based architectures capable of processing large amounts of data and generating complex outputs. This evolution has facilitated the development of tools such as Voting Advice Applications (VAAs), which help voters align their preferences with political parties or candidates, thereby increasing informed voting and overall political engagement \cite{gemenis2024}.
+
+
+
+\begin{itemize}
+    \item history of Wahlomat
+    \item Problems with Wahlomat
+    \item How does Wahlomat work
+    \item some numbers across Europe of user numbers
+\end{itemize}
+
+
+\subsection{AI and Its Potential in Deliberative Democracy}
+
+AI's role in deliberative democracy has opened up new possibilities for enhancing political discourse and decision-making. AI-powered VAAs, particularly those utilizing conversational agents (CAVAAs), provide a more interactive and accessible way for voters to obtain information. A study by Kamoen and Liebrecht (2022) found that users of CAVAAs showed greater improvement in political knowledge and interaction compared to traditional VAAs \cite{kamoen2022}. These applications rely on natural language processing to assist users in understanding political issues, making decision-making easier for a wider range of users.
+\\
+Some of the best-known VAAs include the Dutch \textit{Stemwijzer}, the German \textit{Wahl-O-Mat}, and the Swiss \textit{Smartvote}. These platforms ask users to respond to a series of political statements, after which the VAA matches the user's responses with the most appropriate political party or candidate. These tools are widely used across Europe and have contributed to higher levels of political participation and voter turnout \cite{gemenis2024}. AI-based VAAs, such as CAVAAs, offer enhanced voter engagement by providing real-time, personalized responses to user inquiries \cite{kamoen2022}.
+
+\subsection{Challenges and Dangers of AI in VAAs}
+
+Despite their clear benefits, implementing AI in VAAs introduces several challenges. One significant concern is the inherent bias in AI models, which can result in misleading or inaccurate advice. Additionally, the risk of misinformation increases when generative AI models, prone to hallucination, are used in sensitive electoral contexts \cite{bueno2023}. A notable example is the misuse of AI-driven microtargeting, such as the Cambridge Analytica scandal during the 2016 U.S. elections, which raised ethical questions about AI's role in influencing voters \cite{brand2024}.
+
+\begin{itemize}
+    \item How does ChatGPT vote if they fill out the Wahl-O-Mat?
+    \item Gemini and rest being shut down for US elections
+    \item Cambridge Analytica
+    \item cite more sources for potential risks of AI for democracy
+    \item our deductions from these and approach to safety 
+    \item accuracy of predictions, biases and halucinations depending on party, country, topic...
+\end{itemize}
+
+\subsection{Design approaches and sourcing techniques in CAVAAs}
+
+The accuracy and performance of AI-driven VAAs are highly dependent on the quality of their data sources. Different sourcing techniques, including PDF manifesto scraping, domain-restricted searches, open web searches, and video content from platforms such as YouTube, vary in their reliability. Studies have shown that relying on official documents like party manifestos tends to improve the accuracy of AI predictions, compared to less structured, unrestricted web searches, which introduce greater noise and bias \cite{bueno2023}. 
+
+
+
+\begin{itemize}
+    \item top down or bottom up?
+    \item internet search?
+    \item personification of parties?
+    \item use interviews or short clips as a source?, pros and cons and our deductions
+    \item Abgeordnetenwatch or Democracy reporting International
+\end{itemize}
+
+
+
+
+\subsection{Legal Compliance}
+summary of what the wahlweise people have in their \href{https://d197for5662m48.cloudfront.net/documents/publicationstatus/214219/preprint_pdf/e802706da7ff00ff8f40d50d9deb4e67.pdf}{report}: 
+
+
+\subsection{Ethical Guidance}
+excerpts from \href{https://docs.google.com/document/d/1Z1KqfAmVgEEz0tplmVgrmCt8g56RiUcq3_8HF6Js-2g/edit?tab=t.0}{ethics report}
+
+
+
+
+\newpage
+\section{Methodologies}
+
+
+
+\subsection{Architecture of CAVAA}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{example-image}
+    \caption{Architecture of our different piplines: GPT, naive RAG, Agentic Rag}
+    \label{fig:example2}
+\end{figure}
+
+\begin{itemize}
+    \item All prompts used in this paper are listed in the Appendix
+    \item Explain the different pipelines
+\end{itemize}
+
+
+
+
+
+
+
+
+\subsection{Algorithm Architecture of elections pledge predictions }
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{example-image}
+    \caption{Architecture of our different piplines: GPT, naive RAG, Agentic Rag}
+    \label{fig:example3}
+\end{figure}
+
+\begin{itemize}
+    \item All prompts used in this paper are listed in the Appendix
+    \item Explain the different pipelines
+    \item mention different prompt techniques: without Strategy and with Strategy
+\end{itemize}
+
+
+
+
+
+\subsection{Algorithm Architecture of questions generation }
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{example-image}
+    \caption{Architecture of our different piplines: GPT, naive RAG, Agentic Rag}
+    \label{fig:example2}
+\end{figure}
+
+\begin{itemize}
+    \item All prompts used in this paper are listed in the Appendix
+    \item Explain the different pipelines
+\end{itemize}
+
+
+
+
+
+
+\subsection{Accuracy of prediction of elections pledges}
+
+
+\begin{itemize}
+    \item mention that we use the data from Wahlomat (or maybe even Democracy reporting International)
+    \item Explain the different pipelines
+\end{itemize}
+
+
+
+
+\subsection{Bias Analysis of CAVAA}
+
+
+\begin{itemize}
+    \item Explain the methods we use for this: Ngrams, sentiment analysis, linguistic pattern variance tracking
+    \item Explain the different dimensions we use for this: Models, Political Parties, Countries, Topics
+    \item Explain the evaluation metrics we use for this: Sentiment score distribution, Cross-model prediction variance, Topic-specific bias patterns, Geographic bias variations
+    \item List the numbers: how many exmaples do we run, what prompts, etc.
+\end{itemize}
+
+
+
+\subsection{Injections Testing}
+\begin{itemize}
+    \item We tested 500 different injection attempts across 5 categories:
+        \begin{itemize}
+            \item Off-topic injections (100 examples)
+            \item Prompt leakage attempts (100 examples) 
+            \item System prompt modifications (100 examples)
+            \item Context manipulation (100 examples)
+            \item Malicious output formatting (100 examples)
+        \end{itemize}
+    \item Each injection was tested against both our base GPT-4 model and RAG-enhanced pipeline and other piplines maybe
+    \item Success rates were measured based on:
+        \begin{itemize}
+            \item Deviation from intended political content
+            \item System prompt/instruction leakage
+            \item Context contamination
+            \item Output format manipulation
+        \end{itemize}
+
+\end{itemize}
+
+
+
+
+\newpage
+
+
+
+
+
+
+
+
+
+\section{Analysis}
+
+
+
+
+\subsection{Accuracy of prediction of elections pledges}
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\linewidth]{example-image}
+    \caption{GPT-4o prediction of party pledges}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\linewidth]{example-image}
+    \caption{Llama 3 8B prediction of party pledges}
+    \label{fig:enter-label}
+\end{figure}
+
+
+
+\begin{itemize}
+    \item Explain the different dimensions we use for this: Models, Political Parties, Countries, Topics and how the results differ in those 
+\end{itemize}
+
+
+
+
+
+
+
+\subsection{Bias and Sentiment Analysis}
+
+
+
+
+
+\begin{itemize}
+    \item \textbf{Analysis Methods:}
+       \begin{itemize}
+           \item Traditional N-gram frequency analysis (BERT) (Table: Parties are collums, rows are the words by ranking)
+           \item Transformer-based sentiment extraction
+           \item Linguistic pattern variance tracking (Heatmap/Boxplot: Parties are collums, rows are models, elements are the variance scores)
+           \item Sentence length (Heatmap/Boxplot: Parties are collums, rows are models, elements are the sentence length)
+       \end{itemize}
+   
+
+       \begin{itemize}
+           \item Models: GPT-4, Claude, LLAMA, XAI, Qwen: Use LiteLLM for this to switch easily
+           \item Political Parties: 23   European parties
+           \item Countries: DE, CH, FR, UK,...
+           \item Topics: Environment, Economy, Immigration,...
+       \end{itemize}
+   
+   \item \textbf{Evaluation Metrics:}
+       \begin{itemize}
+           \item Sentiment score distribution
+           \item Cross-model prediction variance
+           \item Topic-specific bias patterns
+           \item Geographic bias variations
+       \end{itemize}
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+\section{Discussion}
+
+
+
+\newpage
+
+
+\section{Follow-up Research}
+
+user feedback AI VAAs vs normal VAAs, what help or what influences? which features....\\
+The primary directions for future research include:
+\begin{itemize}
+   \item Quantitative contrast analysis between party/candidate programme pledges and their subsequent legislative actions, incorporating AI-driven VAA content
+   
+   \item Development of visualization tools for mapping Special Interest Groups and Lobbyist impact on specific legislative actions
+   
+   \item Integration of real-time speech data and social media content into the analytical pipeline
+   
+   \item Systematic interpretation of government budgets and their alignment with stated policies
+   
+   \item Analysis of global economic influences on specific legislation pieces
+   
+   \item Enhanced qualitative understanding of dynamics between people and interest groups within specific institutions
+   
+   \item Development of quantitative and qualitative classification methods for party/candidate ideological descriptions
+   
+   \item Advancement of parliamentary dynamics theory
+   
+   \item Integration framework synthesizing diverse theoretical approaches into cohesive analytical tools
+
+   \item Augmenting Response Quality by including Voting Data \& Parliamentary Dynamics into GraphRAG.
+   
+    \item Human Computer Interaction Analysis: How do people interact with our platform?
+\end{itemize}
+
+
+
+
+
+
+\newpage
+\section{Preliminary, Briefing Document: Analysis of \emph{wahlweise}, a RAG-Based LLM Voting Aid Application}
+
+\subsection*{Summary}
+\begin{itemize}
+    \item This briefing document analyzes the key topics and findings from the research paper: 
+    \emph{“Voting Advice Applications: Implementation of RAG-Supported LLMs.”}
+    \item The paper outlines the development of \emph{wahlweise}, a voting advice application (VAA) created by AI-UI GmbH for the 2024 state elections in Thuringia, Saxony, and Brandenburg.
+    \item \emph{wahlweise} leverages Large Language Models (LLMs) in combination with Retrieval-Augmented Generation (RAG) techniques to create an unbiased, fact-based, and transparent next-generation VAA.
+\end{itemize}
+
+\subsection*{Main Topics}
+
+\subsubsection*{1. Voting Advice Applications (VAAs)}
+\begin{itemize}
+    \item VAAs are gaining importance in Western democracies, particularly as issue-based voting becomes more influential.
+    \item Conventional VAAs (e.g., the German \emph{Wahl-O-Mat}) rely on manually processed data and have faced criticism regarding political neutrality and design.
+    \item Integrating LLMs and RAG techniques offers potential improvements in fairness, impartiality, and transparency for VAAs.
+\end{itemize}
+
+\subsubsection*{2. RAG-Based LLMs}
+\begin{itemize}
+    \item RAG techniques enable LLMs to access external knowledge bases, producing more accurate and fact-based responses.
+    \item This is particularly relevant for VAAs, which require political neutrality and reliable factual information.
+    \item \emph{wahlweise} employs an advanced RAG approach with additional post-retrieval methods to ensure the relevance and accuracy of retrieved data.
+\end{itemize}
+
+\subsubsection*{3. Conception of \emph{wahlweise}}
+\begin{itemize}
+    \item The development of \emph{wahlweise} is based on five core assumptions:
+    \begin{enumerate}
+        \item Issue-based voting
+        \item Habitual voting
+        \item Biased perception of party programs
+        \item Double-blind processing
+        \item Balanced reference data
+    \end{enumerate}
+  
+\end{itemize}
+
+\subsubsection*{4. Preprocessing the Reference Data}
+\begin{itemize}
+    \item \emph{wahlweise} uses official, publicly available party manifestos as the sole reference data source.
+    \item The party manifestos are converted into a machine-readable markdown format and split into sections of at most 512 tokens.
+ 
+\end{itemize}
+
+
+
+  
+
+\subsubsection*{6. Legal Assessment}
+\begin{itemize}
+    \item The development and implementation of \emph{wahlweise} must comply with EU regulations and German federal law.
+    \item Relevant legal frameworks include:
+    \begin{enumerate}
+        \item EU Regulation 2021/0106 (AI Act)
+        \item German Basic Law (GG), in particular Articles 5 and 38
+        \item General Data Protection Regulation (GDPR)
+        \item German Federal Data Protection Act (BDSG)
+        \item Copyright Act (UrhG)
+    \end{enumerate}
+    \item \emph{wahlweise} is designed to protect freedom of opinion, voting rights, equal opportunities for parties, transparency, traceability of decisions, and data privacy.
+\end{itemize}
+
+\subsubsection*{7. Security Assessment and Testing}
+\begin{itemize}
+    \item \emph{wahlweise} underwent extensive security testing with SplxAI to identify risks related to LLM usage.
+    \item Tests included attacks in the following categories:
+    \begin{enumerate}
+        \item Off-topic
+        \item Prompt injection
+        \item RAG precision
+    \end{enumerate}
+    \item Three main risks were identified:
+    \begin{enumerate}
+        \item Social engineering (\textbf{critical})
+        \item Off-topic conversations (\textbf{medium})
+        \item Deliberate misuse (\textbf{medium})
+    \end{enumerate}
+\end{itemize}
+
+\subsubsection*{8. Security Enhancements}
+\begin{itemize}
+
+
+    \item Remaining risks are acknowledged for research purposes, with findings intended to inform future research on security standards for AI-based VAAs.
+\end{itemize}
+
+\subsubsection*{9. Important Quotes}
+\begin{itemize}
+    \item \emph{“Western democracies have seen an increasing importance of issue-based voting on election outcomes... This voting behavior requires an understanding of one’s own political positions and raises the demand for reliable and unbiased sources of information.”}
+    \item \emph{“Since biased LLMs are known to be capable of influencing users’ views and thereby affecting political and electoral processes, this development necessitates the conception of unbiased online platforms as a reliable source of political information.”}
+
+    \item \emph{“\emph{wahlweise} aims to give users a tool to thoroughly understand each party’s positions, enabling them to assess party performance individually.”}
+  
+\end{itemize}
+
+\subsubsection*{10. Conclusion}
+\begin{itemize}
+
+    \item The application emphasizes transparency, security, and accountability in AI-driven solutions.
+    \item It is intended to serve as a research platform to further examine and shape the implications of AI-based VAAs.
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+\section*{Acknowledgments}
+
+This research has been part of the development of \emph{Elect-o-mate.eu}, a conversational AI election tool for the European Elections 2024. The project is a collaborative effort supervised by over 20 researchers and students from ETH Zürich, Hochschule Sankt Gallen, and Universität Zürich. It has been implemented and rigorously tested using election data from over 10 countries. Ongoing efforts focus on institutional implementation for elections in both Ghana and Switzerland, in partnership with officials from the Swiss Government, the West Africa Centre for Counter-Extremism (WACCE), the U.S. Agency for International Development (USAID), and the United Nations Development Programme (UNDP).
+
+This multidisciplinary collaboration, bringing together researchers, policymakers, and international development agencies, seeks to ensure the tool's robustness, adaptability, and scalability in varying electoral environments. We would like to express our gratitude to all the contributors for their dedication and support throughout the development process.
+
+
+
+
+
+
+
+
+
+
+
+
+\begin{thebibliography}{99}
+
+\bibitem{gemenis2024}
+Gemenis, K. (2024). Artificial intelligence and voting advice applications. \textit{Frontiers in Political Science, 6:1286893}. \url{https://doi.org/10.3389/fpos.2024.1286893}
+
+\bibitem{kamoen2022}
+Kamoen, N., and Liebrecht, C. (2022). I Need a CAVAA: How conversational agent voting advice applications affect users' political knowledge and tool experience. \textit{Frontiers in Artificial Intelligence, 5:835505}. \url{https://doi.org/10.3389/frai.2022.835505}
+
+\bibitem{bueno2023}
+Bueno de Mesquita, E., Canes-Wrone, B., Hall, A. B., Lum, K., Martin, G. J., and Velez, Y. R. (2023). Preparing for generative AI in the 2024 election: Recommendations and best practices based on academic research. University of Chicago Harris School of Public Policy and Stanford Graduate School of Business.
+
+\bibitem{brand2024}
+Brand, D. (2024). The use of AI in elections. Eurac Research Blog. \url{https://www.eurac.edu/en/blogs/eureka/the-use-of-ai-in-elections}
+
+\bibitem{juneja2024}
+Juneja, P. (2024). Artificial intelligence for electoral management. International Institute for Democracy and Electoral Assistance (IDEA). \url{https://doi.org/10.31752/idea.2024.31}
+
+\end{thebibliography}
+
+
+
+\end{document}
